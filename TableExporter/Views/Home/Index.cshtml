@@ -1,0 +1,80 @@
+﻿@model TableExporter.Models.FileUploadModel
+@{
+    ViewBag.Title = "Home Page";
+}
+
+<h2>File Upload</h2>
+@using (@Html.BeginForm("FileUpload", "FileUpload", FormMethod.Post, new { @id = "form1", @enctype = "multipart/form-data" }))
+{
+    <table>
+        <tr>
+            <td>
+                <input type="file" name="file_Uploader" />
+            </td>
+            <td>
+                <input type="submit" id="bttn_Upload" value="Загрузить" />
+            </td>
+        </tr>
+    </table>
+    if (Session["fileUploader"] != null)
+    {
+        <div class="upload">
+            <div style="width: 500px;">
+                <table id="uloadTable" border="1">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in (List<TableExporter.Models.FileUploadModel>)Session["fileUploader"])
+                        {
+                            <tr id="@item.FileName">
+                                <td>@item.FileName</td>
+                                <td style="text-align: center">
+                                    <a class="viewc" href="@Url.Action("OpenFile", "FileUpload", new { @fileName = item.FileName })">
+                                        <img width="16" height="16" border="0" src="~/Images/view.png" class="viewc">
+                                    </a>
+                                    <a class="viewc" href="">
+                                        <img width="16" height="16" border="0" src="~/Images/Delete.png" class="link">
+                                    </a>
+                                </td>
+                            </tr>
+
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+}
+
+
+<script>
+    $(document).ready(function () {
+        if('@ViewBag.Message' == 'File Uploaded Successfully')
+        {
+            alert('File Uploaded Successfully');
+        }
+        if ('@ViewBag.Message' == 'File is already exists') {
+            alert('File is already exists');
+        }
+        $('#uloadTable td img.link').live('click', function () {
+            var filename = $(this).parent().parent().parent().attr('id');
+            $(this).parent().parent().parent().remove();
+            $.ajax({
+                type: "post",
+                url: "/FileUpload/RemoveUploadFile?fileName=" + filename,
+                datatype: "json",
+                traditional: true,
+                success: function (data) {
+                    alert('File Deleted');
+                    if (data == 0) {
+                        $('#uloadTable').remove();
+                    }
+                }
+            });
+        });
+    });
+</script>

@@ -1,0 +1,360 @@
+﻿body {
+    padding-top: 50px;
+    padding-bottom: 20px;
+}
+
+/* Set padding to keep content from hitting the edges */
+.body-content {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* Override the default bootstrap behavior where horizontal description lists 
+   will truncate terms that are too long to fit in the left column 
+*/
+.dl-horizontal dt {
+    white-space: normal;
+}
+
+/* Set width on the form input elements since they're 100% wide by default */
+
+select,
+textarea {
+    max-width: 280px;
+}
+
+/* Main table style */
+.Grid {
+    background-color: #fff;
+    margin: 5px 0 10px 0;
+    border: solid 1px #808080;
+    border-collapse: collapse;
+    font-family: 'Times New Roman';
+    color: #000000;
+}
+
+.Grid td {
+    padding: 2px;
+    border: solid 1px #363670;
+}
+
+.Grid th {
+    padding: 10px 10px;
+    color: #fff;
+    background: #552525;
+    border-left: solid 1px #525252;
+    font-size: 1em;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+tr:nth-of-type(odd) {
+    background: #eee;
+}
+
+th {
+    background: #333;
+    color: white;
+    font-weight: bold;
+}
+
+td, th {
+    padding: 6px;
+    border: 1px solid #ccc;
+    text-align: left;
+
+
+}
+
+@media only screen and (max-width: 760px), (min-device-width: 768px) and (max-device-width: 1024px) {
+    table, thead, tbody, th, td, tr {
+        display: block;
+    }
+
+        thead tr {
+            position: absolute;
+            top: -9999px;
+            left: -9999px;
+        }
+
+    tr {
+        border: 1px solid #ccc;
+    }
+
+    td {
+        border: none;
+        border-bottom: 1px solid #eee;
+        position: relative;
+        padding-left: 50%;
+    }
+
+        td:before {
+            position: absolute;
+            top: 6px;
+            left: 6px;
+            width: 45%;
+            padding-right: 10px;
+            white-space: nowrap;
+        }
+
+
+        td:before {
+            content: attr(data-title);
+        }
+}
+.redColor{
+    color:red;
+    font-size:20px;
+}
+
+#nav {
+    margin: 0;
+    line-height: 100%;
+}
+
+    #nav li {
+        margin: 0 5px;
+        padding: 0 0 8px;
+        float: left;
+        position: relative;
+        list-style: none;
+    }
+
+    #nav a {
+        display: block;
+        padding: 8px 20px;
+        margin: 0;
+    }
+
+        #nav a:hover {
+            background: #000;
+            color: #fff;
+        }
+
+    #nav ul li:hover a, #nav li:hover li a {
+        background: none;
+        border: none;
+        color: #000;
+        text-decoration: none;
+    }
+
+    #nav ul a:hover {
+        background: #0078ff 0 -100px !important;
+        color: #fff !important;
+    }
+
+    #nav li:hover > ul {
+        display: block;
+    }
+
+    #nav ul {
+        display: none;
+        margin: 0;
+        padding: 0;
+        width: 125px;
+        position: absolute;
+        top: 35px;
+        left: 0;
+        background: #ddd;
+    }
+
+        #nav ul li {
+            float: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        #nav ul a {
+            font-weight: normal;
+        }
+    /* clearfix */
+    #nav:after {
+        content: ".";
+        display: block;
+        clear: both;
+        visibility: hidden;
+        line-height: 0;
+        height: 0;
+    }
+
+#nav {
+    display: inline-block;
+}
+
+.remove {
+    margin-left: 2px;
+    color: red;
+}
+
+    .remove:hover {
+        cursor: pointer;
+    }
+
+#theadCell {
+    background: transparent;
+    border: none;
+    width: 140px;
+}
+
+#tbodyCell {
+    background: transparent;
+    border: none;
+    width: 100%;
+}
+
+.overlay {
+    position: fixed;
+    z-index: 5;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    left: 0;
+    background-color: rgba(0,0,0,0.6);
+    display: none;
+}
+
+    .overlay.active {
+        display: block;
+    }
+
+    .overlay .flex-popap {
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .overlay .flex-popap .popap {
+            position: relative;
+            background-color: #fff;
+            padding: 35px 25px;
+            margin: 0 10px;
+            max-width: 450px;
+            overflow: auto;
+        }
+
+.popap span {
+    position: absolute;
+    top: 10px;
+    right: 25px;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.example-3 {
+    box-sizing: border-box
+}
+
+.example-3 {
+    position: relative;
+    font: 1em/1.6 "Varela Round",Arial,sans-serif;
+    color: #999;
+    font-weight: 400;
+    max-width: 25em;
+    padding: 1em;
+}
+
+    .example-3 h2 {
+        font-weight: 400
+    }
+
+    .example-3 .filupp > input[type="file"] {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0,0,0,0);
+        border: 0
+    }
+
+    .example-3 .filupp {
+        position: relative;
+        background: #242424;
+        display: block;
+        padding: 1em;
+        font-size: 1em;
+        width: 100%;
+        height: 3.5em;
+        color: #fff;
+        cursor: pointer;
+        box-shadow: 0 1px 3px #0b0b0b
+    }
+
+        .example-3 .filupp:before {
+            content: "";
+            position: absolute;
+            top: 1.5em;
+            right: .75em;
+            width: 2em;
+            height: 1.25em;
+            border: 3px solid #dd4040;
+            border-top: 0;
+            text-align: center
+        }
+
+        .example-3 .filupp:after {
+            content: "\f178";
+            font-family: FontAwesome;
+            -webkit-transform: rotate(-90deg);
+            -moz-transform: rotate(-90deg);
+            -ms-transform: rotate(-90deg);
+            -o-transform: rotate(-90deg);
+            transform: rotate(-90deg);
+            position: absolute;
+            top: .65em;
+            right: .45em;
+            font-size: 2em;
+            color: #dd4040;
+            line-height: 0
+        }
+
+    .example-3 .filupp-file-name {
+        width: 75%;
+        display: inline-block;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        word-wrap: normal
+    }
+
+    .example-3 .filupp2 > input[type="submit"] {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0,0,0,0);
+        border: 0
+    }
+
+    .example-3 .filupp2 {
+        position: relative;
+        background: #242424;
+        display: block;
+        padding: 1em;
+        font-size: 1em;
+        width: 100%;
+        height: 3.5em;
+        color: #fff;
+        cursor: pointer;
+        box-shadow: 0 1px 3px #0b0b0b
+    }
+
+.DynamicTableContainer .tblbut {
+    margin-right: 15px;
+    margin-top: 5px;
+    margin-bottom: 10px;
+}
+
+.yesno {
+    margin-right: 15px;
+    width: 100px;
+}

@@ -1,0 +1,379 @@
+﻿@using System.Data;
+
+@{
+    ViewBag.Title = "ImportExcel";
+}
+
+
+@* Панель управления *@
+<div class="container">
+    <div class="row">
+        <div class="col-lg-4">
+            @using (Html.BeginForm("ImportExcel", "ExcelUpload", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            {
+                <div class="example-3">
+                    <label for="custom-file-upload" class="filupp">
+                        <span class="filupp-file-name js-value">Выбрать файл</span>
+                        <input type="file" value="1" name="FileUpload1" id="custom-file-upload">
+                    </label>
+                    <input class="filupp2" type="submit" id="Submit" name="Submit" value="ЗАГРУЗИТЬ" />
+                </div>
+
+            }
+        </div>
+        <div class="col-lg-2 form-group">
+            <br /> 
+            <input class="btn btn-success" type="button" value="Создать таблицу" onclick="create_table()">
+            <br /> <br />
+            <input class="btn btn-danger" type="button" value="Удалить таблицу" onclick="remove_table()">
+        </div>
+
+        <div class="col-lg-2">
+
+            <div class="form-outline">
+                <label class="form-label" for="typeNumber">Столбцы</label>
+                <input type="number" min="1" max="100" step="1" id="cells" class="form-control" oninput="(validity.valid)||(value=1);" />
+            </div>
+
+            <div class="form-outline">
+                <label class="form-label" for="typeNumber">Строки</label>
+                <input type="number" min="1" max="1000" step="1" id="rows" class="form-control" oninput="(validity.valid)||(value=1);" />
+            </div>
+
+        </div>
+    </div>
+</div>
+<hr />
+
+
+@* Таблица *@
+<form action="/ExcelUpload/ExportTable" method="post">
+    <div id="DynamicTableContainer" class="DynamicTableContainer table-responsive">
+        @if (ViewBag.Data != null)
+        {
+            if ((ViewBag.Data as System.Data.DataTable).Rows.Count > 0)
+            {
+                <div id="TableContent">
+                    <button type="button" class="add-col tblbut">Добавить столбец</button>
+
+                    <table class="table" id="dyntable">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                @foreach (DataColumn column in (ViewBag.Data as System.Data.DataTable).Columns)
+                                {
+                                    <th>
+                                        <input id="theadCell" type="text" class="pull-left" name="col[]" value="@column.ColumnName.ToUpper()" />
+                                        <span class="pull-right remove remove-col">x</span>
+                                    </th>
+                                }
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            @foreach (DataRow dr in (ViewBag.Data as System.Data.DataTable).Rows)
+                            {
+                                <tr>
+                                    <td>
+                                        <span class="remove remove-row">x</span>
+                                    </td>
+                                    @foreach (DataColumn column in (ViewBag.Data as System.Data.DataTable).Columns)
+                                    {
+
+                                        <td data-title='@column.ColumnName'>
+                                            <input id="tbodyCell" name="row[]" value="@dr[column].ToString()" />
+                                        </td>
+                                    }
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+                    <button type="button" class="add-row tblbut">Добавить строку</button>
+
+                    <div class="form-group">
+                        <input type="submit" name="submitButton" value="Выгрузить в DBF" class="btn btn-success tblbut" />
+                        <input type="submit" name="submitButton" value="Выгрузить в XLS" class="btn btn-success tblbut" />
+                        <input type="submit" name="submitButton" value="Выгрузить в XLSX" class="btn btn-success tblbut" />
+                        <input type="submit" name="submitButton" value="Выгрузить в CSV" class="btn btn-success tblbut" />
+                    </div>
+                </div>
+            }
+            else
+            {
+                <label class="redColor">Проверьте заголовки столбцов файла!</label>
+            }
+
+        }
+        else
+        {
+            @*<label  class="redColor">Пожалуйста, загрузите файлы в формате .xls или .xlsx</label>*@
+        }
+
+    </div>
+</form>
+
+
+@* Модальная форма *@
+<div class="overlay" id="modalDelete">
+    <div class="flex-popap">
+        <div class="popap text-center">
+            <h3>Вы действительно хотите удалить текущую таблицу?</h3>
+            <button class="btn btn-success yesno" id="ok_btn">Да</button>
+            <button class="btn btn-danger yesno" id="close_btn">Нет</button>
+        </div>
+    </div>
+</div>
+
+
+
+
+@* Подключение внешних скриптов *@
+<script src="https://code.jquery.com/jquery-1.11.2.js"></script>
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+<script>
+
+    // --- start function --- //
+
+
+    // удаление таблицы
+    function remove_table() {
+        var content = document.getElementById('TableContent');
+        if (content) {
+            $("#modalDelete").addClass('active');
+        }
+    }
+
+    // создание таблицы
+    function create_table() {
+        var content = document.getElementById('TableContent');
+        if (!content) {
+            generate_table();
+        }
+    }
+
+    // генерация таблицы
+    function generate_table() {
+        // get the reference for the body
+        var cont = document.querySelector(`#DynamicTableContainer`);
+        const rowsField = document.querySelector(`#rows`);
+        const cellsField = document.querySelector(`#cells`);
+        // создаем контейнер
+        var tableContent = document.createElement("div");
+        tableContent.id = "TableContent";
+        // создаем кнопку добавления нового столбца
+        var btnCol = document.createElement("button");
+        // определяем свойства кнопки
+        btnCol.setAttribute("type", "button");
+        btnCol.textContent = "Добавить столбец";
+        btnCol.setAttribute("class", "add-col tblbut");
+        // создаем кнопку добавления новой строки
+        var btnRow = document.createElement("button");
+        // определяем свойства кнопки
+        btnRow.setAttribute("type", "button");
+        btnRow.textContent = "Добавить строку";
+        btnRow.setAttribute("class", "add-row tblbut");
+
+        var GroupBtn = document.createElement("div");
+        GroupBtn.setAttribute("class", "form-group");
+
+
+        // создаем кнопку Выгрузить в DBF
+        var btnDBF = document.createElement("input");
+        // определяем свойства кнопки
+        btnDBF.setAttribute("type", "submit");
+        btnDBF.setAttribute("value", "Выгрузить в DBF");
+        btnDBF.setAttribute("class", "btn btn-success tblbut");
+        btnDBF.setAttribute("name", "submitButton");
+        // создаем кнопку Выгрузить в XLS
+        var btnXLS = document.createElement("input");
+        // определяем свойства кнопки
+        btnXLS.setAttribute("type", "submit");
+        btnXLS.setAttribute("value", "Выгрузить в XLS");
+        btnXLS.setAttribute("class", "btn btn-success tblbut");
+        btnXLS.setAttribute("name", "submitButton");
+
+        // создаем кнопку Выгрузить в XLSX
+        var btnXLSX = document.createElement("input");
+        // определяем свойства кнопки
+        btnXLSX.setAttribute("type", "submit");
+        btnXLSX.setAttribute("value", "Выгрузить в XLSX");
+        btnXLSX.setAttribute("class", "btn btn-success tblbut");
+        btnXLSX.setAttribute("name", "submitButton");
+
+        // создаем кнопку Выгрузить в CSV
+        var btnCSV = document.createElement("input");
+        // определяем свойства кнопки
+        btnCSV.setAttribute("type", "submit");
+        btnCSV.setAttribute("value", "Выгрузить в CSV");
+        btnCSV.setAttribute("class", "btn btn-success tblbut");
+        btnCSV.setAttribute("name", "submitButton");
+
+        GroupBtn.appendChild(btnDBF);
+        GroupBtn.appendChild(btnXLS);
+        GroupBtn.appendChild(btnXLSX);
+        GroupBtn.appendChild(btnCSV);
+
+        // creates a <table> element and a <tbody> element
+        var tbl = document.createElement("table");
+        tbl.setAttribute("class", "table");
+        tbl.setAttribute("id", "dyntable");
+        var tblHead = document.createElement("thead");
+        var tblBody = document.createElement("tbody");
+
+        // добавляем первый пустой заголовок
+        var row = document.createElement("tr");
+        var cell = document.createElement("th");
+        row.appendChild(cell);
+        // добавляем заголовки
+        for (var i = 0; i < cellsField.value; i++) {
+            // создаем новый th
+            var cell = document.createElement("th");
+            // создаем новый input
+            var feld = document.createElement("input");
+            // определяем свойства input
+            feld.setAttribute("type", "text");
+            feld.setAttribute("value", "Поле" + (i+1));
+            feld.setAttribute("class", "pull-left");
+            feld.setAttribute("id", "theadCell");
+            feld.setAttribute("name", "col[]");
+
+
+            // создаем новый span
+            var span = document.createElement("span");
+            // определяем свойства span
+            span.setAttribute("type", "text");
+            span.textContent = "x";
+            span.setAttribute("class", "pull-right remove remove-col");
+
+            // помещаем внутри заголока input и span
+            cell.appendChild(feld);
+            cell.appendChild(span);
+            // add the row to the end of the table head
+            row.appendChild(cell);
+        }
+        tblHead.appendChild(row);
+
+        // creating all cells
+        for (var i = 0; i < rowsField.value; i++) {
+            // creates a table row
+            var row = document.createElement("tr");
+            // создаем новый td
+            var cell = document.createElement("td");
+            // создаем новый span
+            var span = document.createElement("span");
+            // определяем свойства span
+            span.setAttribute("type", "text");
+            span.textContent = "x";
+            span.setAttribute("class", "remove remove-row");
+            // помещаем внутри строки span
+            cell.appendChild(span);
+            row.appendChild(cell);
+            // Create a <td> element and a text node, make the text
+            // node the contents of the <td>, and put the <td> at
+            // the end of the table row
+            for (var j = 0; j < cellsField.value; j++) {
+                var cell = document.createElement("td");
+                var feld = document.createElement("input");
+                feld.setAttribute("id", "tbodyCell");
+                feld.setAttribute("name", "row[]");
+                cell.appendChild(feld);
+                row.appendChild(cell);
+            }
+            // add the row to the end of the table body
+            tblBody.appendChild(row);
+        }
+        // put the <tbody> in the <table>
+        tbl.appendChild(tblHead);
+        tbl.appendChild(tblBody);
+        
+        // appends <table> and buttons into <body>
+        tableContent.appendChild(btnCol);
+        tableContent.appendChild(tbl);
+        tableContent.appendChild(btnRow);
+        tableContent.appendChild(GroupBtn);
+
+        cont.appendChild(tableContent);
+
+    }
+
+    // --- end function --- //
+
+
+    // --- start jquary --- //
+
+    // add/delete the row/column
+    $(document).ready(function () {
+
+        // add row
+        $('body').on('click', '.add-row', function () {
+            var tr = $(this).parents('.DynamicTableContainer').find('.table tbody tr:last');
+            if (tr.length > 0) {
+                var clone = tr.clone();
+                clone.find(':text').val('');
+                tr.after(clone);
+            }
+            else {
+                var cols = $(this).closest('.DynamicTableContainer').find('th').length, tr0 = $('<tr/>');
+                tr0.html('<td><span class="remove remove-row">x</span></td><td> <input id="tbodyCell" name="row[]" type="text"> </td>');
+                for (var i = 2; i < cols; i++) {
+                    tr0.append('<td></td>')
+                }
+                $(this).closest('.DynamicTableContainer').find('.table tbody').append(tr0);
+
+            }
+        });
+
+        // delete row
+        $('body').on('click', '.remove-row', function () {
+            $(this).parents('tr').remove();
+        });
+
+        // add column
+        $('body').on('click', '.add-col', function () {
+
+            var colCount = $("#dyntable tr th").length;
+
+            $(this).parent().find('.table thead tr').append('<th><input id="theadCell" type="text" class="pull-left" name="col[]" value="Поле' + colCount + '"> <span class="pull-right remove remove-col">x</span></th>');
+            $(this).parent().find('.table tbody tr').append('<td><input id="tbodyCell" name="row[]" ></td>');
+        });
+
+        // remove column
+        $('body').on('click', '.remove-col', function (event) {
+            // Get index of parent TD among its siblings (add one for nth-child)
+            var ndx = $(this).parent().index() + 1;
+            // Find all TD elements with the same index
+            $('th', event.delegateTarget).remove(':nth-child(' + ndx + ')');
+            $('td', event.delegateTarget).remove(':nth-child(' + ndx + ')');
+        });
+
+        // Скрипт отображает имя файла после его загрузки.
+        $('input[type="file"]').change(function () {
+            var value = $("input[type='file']").val();
+            $('.js-value').text(value);
+        });
+
+
+    });
+
+    // jquary close modal
+    $("#close_btn").click(function () {
+        $(".overlay").removeClass("active");
+    });
+
+    // удаление таблицы
+    $("#ok_btn").click(function () {
+        var removeTab = document.getElementById('TableContent');
+        var parentEl = removeTab.parentElement;
+        parentEl.removeChild(removeTab);
+        $(".overlay").removeClass("active");
+    });
+
+
+    // --- end jquary --- //
+
+</script>
+
+
+
